@@ -1,4 +1,6 @@
-# This is the official implementation  for our paper "Towards Calibrated Hyper-Sphere Representation via Distribution Overlap Coefficient for Long-Tailed Learning" (accepted by ECCV 2022)
+# This is the official implementation  for our paper "Towards Calibrated Hyper-Sphere Representation via Distribution Overlap Coefficient for Long-Tailed Learning" (ECCV 2022 oral)
+
+![Pipeline]("https://raw.githubusercontent.com/SiLangWHL/vMF-OP/master/vmf.png")
 
 ## News
 - [2022/08/21] We release the code for Image Classification task on ImageNet-LT dataset. Recently, we further improve the performance of our method. Now, you can achieve about overall 54.5% accuracy via using 'vmf_classifier + icd loss', about 1.0% higher than result published in our camera ready paper.
