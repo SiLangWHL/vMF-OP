@@ -1,0 +1,44 @@
+criterions:
+  PerformanceLoss:
+    def_file: ./loss/SoftmaxLoss.py
+    loss_params: {}
+    optim_params: null
+    weight: 1.0
+last: false
+apply_ipca: false
+num_components: 512
+model_dir: null
+tuning_memory: true
+overlap_opt:
+  auxloss: [] 
+  auxlossweight: 0.2
+networks:
+  classifier:
+    def_file: ./models/multi_k_vmf_classifier.py 
+    optim_params: {lr: 0.1, momentum: 0.9, weight_decay: 0.0005, kappa_decay: 0.0}
+    scheduler_params: {coslr: true, endlr: 0.0, gamma: 0.1, step_size: 15}
+    params: {dataset: ImageNet_LT, feat_dim: 2048, num_classes: 1000, k_init: 16.0}
+  feat_model:
+    def_file: ./models/ResNext50Feature.py
+    fix: false
+    optim_params: {lr: 0.2, momentum: 0.9, weight_decay: 0.0005}
+    scheduler_params: {coslr: true, endlr: 0.0, gamma: 0.1, step_size: 15}
+    params: {dataset: ImageNet_LT, dropout: null, stage1_weights: false, use_fc: false, last_relu: true}
+shuffle: false
+training_opt:
+  backbone: resnext50
+  batch_size: 256
+  dataset: ImageNet_LT
+  display_step: 10
+  display_grad: False
+  display_grad_step: 10
+  feature_dim: 2048
+  log_dir: ./logs/ImageNet_LT/vmf_0.1_detachbias
+  log_root: /logs/ImageNet_LT
+  num_classes: 1000
+  num_epochs: 45
+  img_num: 2
+  num_workers: 12
+  open_threshold: 0.1
+  sampler: null
+  sub_dir: models
