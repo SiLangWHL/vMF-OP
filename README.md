@@ -2,6 +2,9 @@
 
 ![Pipeline](./vmf.png)
 
+## TODO
+-[2022/08/23] We will update code about loss_cfc mentioned in the paper and experimental environment configuration at this weekend. At next week, we will update some code comments to help you understand how we implemented the formulas in the pape.
+
 ## News
 - [2022/08/21] We release the code for Image Classification task on ImageNet-LT dataset. Recently, we further improve the performance of our method. Now, you can achieve about overall 54.5% accuracy via using 'vmf_classifier + icd loss', about 1.0% higher than result published in our camera ready paper.
 
