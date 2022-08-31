@@ -96,10 +96,17 @@ def get_all_overlap(op_opt, apk, bias, kappa, feat, gt, num_classes, mu, ni):
         loss_icd = ( ni * valid_op ).mean().mean() #.sum().sum() / ni.sum().sum()
     else:
         loss_icd = 0
+    if 'cfc' in op_opt['auxloss']:
+        sim_feat_class = ( mu[mask] * mu_feat ).sum(1)
+        kl = apk[mask] * kappa[mask] * ( 1 - sim_feat_class )
+        op = 1 / ( 1 + kl ) 
+        loss_cfc = ( 1 - op ).mean() 
+    else:
+        loss_cfc = 0
     with torch.no_grad():
         sim_c = (ni * sim_class).mean(1).mean(0)
         op = valid_op.mean(1)
-    return loss_icd, op, sim_c
+    return loss_icd, loss_cfc, op, sim_c
 
 ni = read_ni()
 def multi_get_loss(op_opt, p, kappa, weight, feat, gt, num_classes):
@@ -107,8 +114,8 @@ def multi_get_loss(op_opt, p, kappa, weight, feat, gt, num_classes):
     apk = get_apk(p, kappa)
     bias = get_bias(p, kappa, apk)
     if op_opt['auxloss'] != []:
-        loss_icd, op, sim_c = get_all_overlap(op_opt, apk, bias, kappa, feat, gt, num_classes, mu, ni)
+        loss_icd, loss_cfc, op, sim_c = get_all_overlap(op_opt, apk, bias, kappa, feat, gt, num_classes, mu, ni)
     else:
-        loss_icd, sim_c, op = 0.0, 0.0, bias.detach()
-    return loss_icd, bias, op, sim_c
+        loss_icd, loss_cfc, sim_c, op = 0.0, 0.0, 0.0, bias.detach()   #  hard code to avoid happening errors when running codes, I will rewrite it.
+    return loss_icd, loss_cfc, bias, op, sim_c
 

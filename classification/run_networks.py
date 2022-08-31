@@ -231,7 +231,7 @@ class model ():
                     var_dic['feat'], var_dic['gt'] = self.features, labels
                     var_dic['op_opt'] = self.op_opt
                     kappa = var_dic['kappa'].detach()
-                    self.loss_icd, bias, op, self.sim_c = multi_get_loss(**var_dic)
+                    self.loss_icd, self.loss_cfc, bias, op, self.sim_c = multi_get_loss(**var_dic)
                     self.networks['classifier'].module.bias = bias
                     self.networks['classifier'].module.op = op
                     self.logits = self.networks['classifier'](self.features, bias.repeat(self.num_gpus)) 
@@ -263,9 +263,11 @@ class model ():
             self.loss_perf = self.criterions['PerformanceLoss'](self.logits, labels)
             self.loss_perf *=  self.criterion_weights['PerformanceLoss']
             self.loss += self.loss_perf
+        weight = self.op_opt['auxlossweight'] * (1 - self.current_epoch / self.total_epoch) ** 0.9
         if 'icd' in self.op_opt['auxloss']:
-            weight = self.op_opt['auxlossweight'] * (1 - self.current_epoch / self.total_epoch) ** 0.9
             self.loss += weight * self.loss_icd 
+        if 'cfc' in self.op_opt['auxloss']:
+            self.loss += weight * self.loss_cfc 
 
     
     def shuffle_batch(self, x, y):
@@ -361,6 +363,9 @@ class model ():
 
                         if 'icd' in self.op_opt['auxloss']:
                             minibatch_loss_icd = self.loss_icd.item()
+                        if 'cfc' in self.op_opt['auxloss']:
+                            minibatch_loss_cfc = self.loss_cfc.item()
+
 
                         minibatch_acc = mic_acc_cal(preds, labels)
 
@@ -377,6 +382,8 @@ class model ():
                         if 'vmf' in self.config['networks']['classifier']['def_file']:
                             if 'icd' in self.op_opt['auxloss']:
                                 print_str += ['Licd: %.3f'% (minibatch_loss_icd)]
+                            if 'cfc' in self.op_opt['auxloss']:
+                                print_str += ['Lcfc: %.3f'% (minibatch_loss_cfc)]
                         print_write(print_str, self.log_file)
 
                         loss_info = {
